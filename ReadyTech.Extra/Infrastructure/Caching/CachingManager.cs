@@ -7,34 +7,39 @@ namespace Infrastructure.Caching;
 
 public class CachingManager : ICacheManager
 {
-    private readonly IDistributedCache _distributeCache;
+    private readonly IDistributedCache _distributedCache;
     private readonly ILogger<CachingManager> _logger;
 
     public CachingManager(
         IDistributedCache distributedCache,
         ILogger<CachingManager> logger)
     {
-        _distributeCache = distributedCache;
+        _distributedCache = distributedCache;
         _logger = logger;
 
     }
-    public async Task<IEnumerable<T>> GetCollectionAsync<T>(int chunkSize) where T : notnull
+    public async Task<T> GetRecordAsync<T>(string key)
     {
         try
         {
+          string result = await _distributedCache.GetStringAsync(key)??"";
+           if (!string.IsNullOrEmpty(result)) 
+            {
+                T data = JsonSerializer.Deserialize<T>(result);
+                return data;
+            }
 
+            return default(T);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
 
-            return Enumerable.Empty<T>();
+            throw;
         }
-        return Enumerable.Empty<T>();
     }
 
     public async Task SetRecordAsync<T>(
-        IDistributedCache distributedCache,
         string key,
         T data,
         TimeSpan? absoluteExpireTime = null,
@@ -50,14 +55,15 @@ public class CachingManager : ICacheManager
                 SlidingExpiration = unusedExpireTime ?? TimeSpan.FromSeconds(60)
             };
 
-            string jsonData = JsonSerializer.Serialize(data);
+            string jsonData =  JsonSerializer.Serialize(data);
 
-            await distributedCache.SetStringAsync(key, jsonData, distributedCacheEntryOptions);
+            await _distributedCache.SetStringAsync(key, jsonData, distributedCacheEntryOptions);
+        }
 
         catch (Exception ex)
         {
             _logger.LogError(ex.Message);
-
+            throw;
         }
     }
 }
