@@ -33,7 +33,7 @@ public class BrewCoffeeQueryHandler : IRequestHandler<BrewCoffeeQuery, BrewCoffe
 
     public async Task<BrewCoffeeQueryResponse> Handle(BrewCoffeeQuery brewCoffeeQuery, CancellationToken cancellationToken)
     {
-        BrewCoffeeQueryResponse brewCoffeeQueryResponse = null;
+        BrewCoffeeQueryResponse? brewCoffeeQueryResponse = null;
 
         try
         {

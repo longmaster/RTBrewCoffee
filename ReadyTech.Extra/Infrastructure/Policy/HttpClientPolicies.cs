@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Polly.Timeout;
+﻿using Polly.Timeout;
 using Polly.Retry;
 using Polly;
 using System.Diagnostics;
