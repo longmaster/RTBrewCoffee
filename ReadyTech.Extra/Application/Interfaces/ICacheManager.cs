@@ -9,5 +9,5 @@ public interface ICacheManager
         TimeSpan? absoluteExpireTime = null,
         TimeSpan? unusedExpireTime = null);
 
-    Task<T> GetRecordAsync<T>(string key);
+    Task<T?> GetRecordAsync<T>(string key);
 }

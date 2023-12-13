@@ -19,6 +19,10 @@ builder.Services.AddOptions<ConnectionConfig>()
             .Bind(builder.Configuration.GetSection(ConnectionConfig.CachingSection))
             .ValidateDataAnnotations();
 
+builder.Services.AddOptions<CacheConfig>()
+            .Bind(builder.Configuration.GetSection(CacheConfig.CachingSection))
+            .ValidateDataAnnotations();
+
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

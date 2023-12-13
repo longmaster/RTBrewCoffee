@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Domain.OpenWeather
 {
     public class Coord
     {
-        [JsonProperty("lon")]
+        [JsonPropertyName("lon")]
         public double Lon { get; set; }
 
-        [JsonProperty("lat")]
+        [JsonPropertyName("lat")]
         public double Lat { get; set; }
     }
 }

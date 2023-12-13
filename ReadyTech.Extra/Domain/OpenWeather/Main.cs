@@ -1,25 +1,25 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Domain.OpenWeather
 {
     public class Main
     {
-        [JsonProperty("temp")]
+        [JsonPropertyName("temp")]
         public double Temp { get; set; }
 
-        [JsonProperty("feels_like")]
+        [JsonPropertyName("feels_like")]
         public double FeelsLike { get; set; }
 
-        [JsonProperty("temp_min")]
+        [JsonPropertyName("temp_min")]
         public double TempMin { get; set; }
 
-        [JsonProperty("temp_max")]
+        [JsonPropertyName("temp_max")]
         public double TempMax { get; set; }
 
-        [JsonProperty("pressure")]
+        [JsonPropertyName("pressure")]
         public long Pressure { get; set; }
 
-        [JsonProperty("humidity")]
+        [JsonPropertyName("humidity")]
         public long Humidity { get; set; }
     }
 }

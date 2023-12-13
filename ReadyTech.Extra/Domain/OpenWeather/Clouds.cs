@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
+
 
 namespace Domain.OpenWeather
 {
     public class Clouds
     {
-        [JsonProperty("all")]
+        [JsonPropertyName("all")]
         public long All { get; set; }
     }
 }

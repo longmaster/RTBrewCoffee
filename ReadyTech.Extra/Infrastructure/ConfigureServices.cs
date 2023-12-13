@@ -1,6 +1,10 @@
 ﻿using Application.Interfaces;
 using Common.Interfaces;
+using Flurl.Http;
+using Flurl.Http.Configuration;
 using Infrastructure.Caching;
+using Infrastructure.Policy;
+using Infrastructure.WeatherData;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
@@ -15,20 +19,21 @@ public static class ConfigureServices
             throw new ArgumentNullException(nameof(services));
         }
 
+        services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
+
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = redisConnectionString ;
- 
-
-            options.ConfigurationOptions = new ConfigurationOptions()
-            {
-                ConnectRetry = 4,
-                ReconnectRetryPolicy = new LinearRetry(2000)
-            };
+      
         });
 
-        services.AddScoped<IDateTimeSnapshot, DateTimeSnapshot>();
+        services.AddTransient<IDateTimeSnapshot, DateTimeSnapshot>();
         services.AddScoped<ICacheManager, CachingManager>();
+        services.AddTransient(typeof(IWeatherClient<>), typeof(WeatherClient<>));
+        services.AddTransient<IWeatherDataEngine, WeatherDataEngine>();
+
+        // Polly - Retry & Timeout policies configuration
+        FlurlHttp.Configure(settings => settings.HttpClientFactory = new CustomPollyHttpClientFactory());
 
         return services;
     }

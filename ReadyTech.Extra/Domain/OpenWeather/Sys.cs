@@ -1,22 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Domain.OpenWeather
 {
     public class Sys
     {
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public long Type { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public long Id { get; set; }
 
-        [JsonProperty("country")]
+        [JsonPropertyName("country")]
         public string Country { get; set; }
 
-        [JsonProperty("sunrise")]
+        [JsonPropertyName("sunrise")]
         public long Sunrise { get; set; }
 
-        [JsonProperty("sunset")]
+        [JsonPropertyName("sunset")]
         public long Sunset { get; set; }
     }
 }

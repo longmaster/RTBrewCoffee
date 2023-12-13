@@ -1,64 +1,76 @@
 ﻿using Application.Interfaces;
 using Common;
 using Common.Constants;
-using Common.Exceptions;
 using Common.Interfaces;
+using Domain.OpenWeather;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Brew.Commands
+namespace Application.Brew.Commands;
+
+public class BrewCoffeeQueryHandler : IRequestHandler<BrewCoffeeQuery, BrewCoffeeQueryResponse>
 {
-    public class BrewCoffeeQueryHandler : IRequestHandler<BrewCoffeeQuery, BrewCoffeeQueryResponse>
+    private readonly ILogger<BrewCoffeeQueryHandler> _logger;
+    private readonly IDateTimeSnapshot _dateTimeSnapshot;
+    private readonly ICoffeeCounter _coffeesCounter;
+    private readonly IWeatherDataEngine _weatherDataEngine;
+    private readonly IBrewCoffeeOperationException _brewCoffeeOperationException;
+
+    public BrewCoffeeQueryHandler(
+        ILogger<BrewCoffeeQueryHandler> logger,  
+        ICoffeeCounter coffeeCounter, 
+        IDateTimeSnapshot dateTimeSnapshot,
+        IWeatherDataEngine weatherDataEngine,
+        IBrewCoffeeOperationException brewCoffeeOperationException
+         )
+    { 
+        _logger = logger;
+        _coffeesCounter = coffeeCounter;
+        _weatherDataEngine = weatherDataEngine;
+        _brewCoffeeOperationException = brewCoffeeOperationException;
+        _dateTimeSnapshot = dateTimeSnapshot;
+    }
+
+    public async Task<BrewCoffeeQueryResponse> Handle(BrewCoffeeQuery brewCoffeeQuery, CancellationToken cancellationToken)
     {
-        private readonly ILogger<BrewCoffeeQueryHandler> _logger;
-        private readonly IDateTimeSnapshot _dateTimeSnapshot;
-        private readonly ICoffeeCounter _coffeesCounter;
+        BrewCoffeeQueryResponse brewCoffeeQueryResponse = null;
 
-        private const int MaxCoffee = 5;
-
-        public BrewCoffeeQueryHandler(ILogger<BrewCoffeeQueryHandler> logger, IDateTimeSnapshot dateTimeSnapshot, ICoffeeCounter coffeeCounter)
-        { 
-            _logger = logger;
-            _dateTimeSnapshot = dateTimeSnapshot;
-            _coffeesCounter = coffeeCounter;
-
-        }
-
-        public Task<BrewCoffeeQueryResponse> Handle(BrewCoffeeQuery brewCoffeeQuery, CancellationToken cancellationToken)
+        try
         {
-            BrewCoffeeQueryResponse brewCoffeeQueryResponse = null;
-
-            try
-            {
-                if (_coffeesCounter.Counter == MaxCoffee)
-                {
-                    
-                    throw new OutOfCoffeeException();
-         
-                }
-                else if (_dateTimeSnapshot.GetDate is { Day:01, Month:04 })
-                {
-                    throw new AprilFoolException();
-                }
-
-                brewCoffeeQueryResponse = new BrewCoffeeQueryResponse
-                {
-                    StatusMessage = StatusMessageConstants.Get(200),
-                    PreparedDate = _dateTimeSnapshot.GetDateTimeFormattedIso(),
-                };
+            _brewCoffeeOperationException.Execute();
 
 
-                _coffeesCounter.Execute();
-            }
-            catch (Exception ex) 
-            {
-                _logger.LogError(ex.Message);
-                throw;
-            }
+            brewCoffeeQueryResponse = await  _buildBbrewCoffeeQueryResponse();
 
-            return Task.FromResult(brewCoffeeQueryResponse);
+        }
+        catch (Exception ex) 
+        {
+            _logger.LogError(ex.Message);
+            throw;
         }
 
+        return brewCoffeeQueryResponse;
+    }
+
+    private async Task<BrewCoffeeQueryResponse> _buildBbrewCoffeeQueryResponse()
+    {
+        OpenWeather openWeather = await _weatherDataEngine.GetWeatherAsync();
+
+        _coffeesCounter.Execute();
+
+        if (openWeather != null && openWeather?.Main?.Temp > 30)
+        {
+            return new BrewCoffeeQueryResponse
+            {
+                StatusMessage = StatusMessageConstants.GetByTemperature(openWeather.Main.Temp),
+                PreparedDate = _dateTimeSnapshot.GetDateTimeFormattedIso(),
+            };
+        }
+        return  new BrewCoffeeQueryResponse
+        {
+            StatusMessage = StatusMessageConstants.Get(200),
+            PreparedDate = _dateTimeSnapshot.GetDateTimeFormattedIso(),
+        };
 
     }
 }

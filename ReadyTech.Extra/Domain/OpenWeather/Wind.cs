@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Domain.OpenWeather
 {
     public class Wind
     {
-        [JsonProperty("speed")]
+        [JsonPropertyName("speed")]
         public double Speed { get; set; }
 
-        [JsonProperty("deg")]
+        [JsonPropertyName("deg")]
         public long Deg { get; set; }
 
-        [JsonProperty("gust")]
+        [JsonPropertyName("gust")]
         public double Gust { get; set; }
     }
 }

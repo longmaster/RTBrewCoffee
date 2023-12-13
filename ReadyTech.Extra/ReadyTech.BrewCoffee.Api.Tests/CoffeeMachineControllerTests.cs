@@ -1,102 +1,104 @@
-namespace ReadyTech.BrewCoffee.Api.Tests
+using Microsoft.Extensions.Logging;
+
+namespace ReadyTech.BrewCoffee.Api.Tests;
+
+public class CoffeeMachineControllerTests
 {
-    public class CoffeeMachineControllerTests
+    private readonly Mock<IMediator> _mockMediator = new Mock<IMediator>();
+    private readonly CoffeeMachineController _coffeeMachineController;
+    private readonly Mock<ILogger<CoffeeMachineController>> _logger =  new Mock<ILogger<CoffeeMachineController>>();
+   public CoffeeMachineControllerTests() 
     {
-        private readonly Mock<IMediator> _mockMediator = new Mock<IMediator>();
-        private readonly CoffeeMachineController _coffeeMachineController;
-        public CoffeeMachineControllerTests() 
-        {
-            _setupMockMediator(new BrewCoffeeQueryResponse());
+        _setupMockMediator(new BrewCoffeeQueryResponse());
 
-            _coffeeMachineController = new CoffeeMachineController(_mockMediator.Object);
-        }
+        _coffeeMachineController = new CoffeeMachineController(_mockMediator.Object, _logger.Object);
+    }
 
 
-        [Fact]
-        public async Task Brew_Success_Return200()
-        {
-            // Assign
-            _setupMockMediator(BrewCoffeeTestData.BrewCoffeeQuerySuccessfulResponse());
+    [Fact]
+    public async Task Brew_Success_Return200()
+    {
+        // Assign
+        _setupMockMediator(BrewCoffeeTestData.BrewCoffeeQuerySuccessfulResponse());
 
-            // Act
+        // Act
 
-            ActionResult<BrewCoffeeQueryResponse> testResponse =
-                    Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
-                    (await this._coffeeMachineController.Brew());
+        ActionResult<BrewCoffeeQueryResponse> testResponse =
+                Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
+                (await this._coffeeMachineController.Brew());
 
-            OkObjectResult returnValue = Assert.IsType<OkObjectResult>(testResponse.Result);
+        OkObjectResult returnValue = Assert.IsType<OkObjectResult>(testResponse.Result);
 
-            // Assert
-            Assert.Equal(StatusCodes.Status200OK, returnValue.StatusCode);
-          
-        }
+        // Assert
+        Assert.Equal(StatusCodes.Status200OK, returnValue.StatusCode);
+      
+    }
 
-        [Fact]
-        public async Task Brew_Success_ValidResponse()
-        {
-            // Assign
-            _setupMockMediator(BrewCoffeeTestData.BrewCoffeeQuerySuccessfulResponse(new DateTime (2023,1,1)));
+    [Fact]
+    public async Task Brew_Success_ValidResponse()
+    {
+        // Assign
+        _setupMockMediator(BrewCoffeeTestData.BrewCoffeeQuerySuccessfulResponse(new DateTime (2023,1,1)));
 
-            // Act
+        // Act
 
-            ActionResult<BrewCoffeeQueryResponse> testResponse =
-                    Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
-                    (await this._coffeeMachineController.Brew());
+        ActionResult<BrewCoffeeQueryResponse> testResponse =
+                Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
+                (await this._coffeeMachineController.Brew());
 
-            OkObjectResult returnValue = Assert.IsType<OkObjectResult>(testResponse.Result);
-            BrewCoffeeQueryResponse? brewCoffeeQueryResponse = returnValue.Value is BrewCoffeeQueryResponse ? (BrewCoffeeQueryResponse)returnValue.Value: null;
+        OkObjectResult returnValue = Assert.IsType<OkObjectResult>(testResponse.Result);
+        BrewCoffeeQueryResponse? brewCoffeeQueryResponse = returnValue.Value is BrewCoffeeQueryResponse ? (BrewCoffeeQueryResponse)returnValue.Value: null;
 
-            // Assert
-            Assert.Equal("Your piping hot coffee is ready", brewCoffeeQueryResponse.StatusMessage);
-            Assert.Equal(brewCoffeeQueryResponse.PreparedDate.ToString(), (new DateTime(2023, 1, 1)).ToString());
+        // Assert
+        Assert.Equal("Your piping hot coffee is ready", brewCoffeeQueryResponse.StatusMessage);
+        Assert.Equal(brewCoffeeQueryResponse.PreparedDate.ToString(), (new DateTime(2023, 1, 1)).ToString());
 
-        }
-        [Fact]
-        public async Task Brew_ThrowOutOfCoffeeException_Return503()
-        {
-            // Assign
-            _setupMockMediatorThrowException<OutOfCoffeeException>();
+    }
+    [Fact]
+    public async Task Brew_ThrowOutOfCoffeeException_Return503()
+    {
+        // Assign
+        _setupMockMediatorThrowException<OutOfCoffeeException>();
 
-            // Act
+        // Act
 
-            ActionResult<BrewCoffeeQueryResponse> testResponse =
-                    Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
-                    (await this._coffeeMachineController.Brew());
+        ActionResult<BrewCoffeeQueryResponse> testResponse =
+                Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
+                (await this._coffeeMachineController.Brew());
 
-            ObjectResult returnValue = Assert.IsType<ObjectResult>(testResponse.Result);
+        ObjectResult returnValue = Assert.IsType<ObjectResult>(testResponse.Result);
 
-            // Assert
-            Assert.Equal(StatusCodes.Status503ServiceUnavailable, returnValue.StatusCode);
+        // Assert
+        Assert.Equal(StatusCodes.Status503ServiceUnavailable, returnValue.StatusCode);
 
-        }
+    }
 
-        [Fact]
-        public async Task Brew_AprilFoolException_Return418Teapot()
-        {
-            // Assign
-            _setupMockMediatorThrowException<AprilFoolException>();
+    [Fact]
+    public async Task Brew_AprilFoolException_Return418Teapot()
+    {
+        // Assign
+        _setupMockMediatorThrowException<AprilFoolException>();
 
-            // Act
+        // Act
 
-            ActionResult<BrewCoffeeQueryResponse> testResponse =
-                    Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
-                    (await this._coffeeMachineController.Brew());
+        ActionResult<BrewCoffeeQueryResponse> testResponse =
+                Assert.IsType<ActionResult<BrewCoffeeQueryResponse>>
+                (await this._coffeeMachineController.Brew());
 
-            ObjectResult returnValue = Assert.IsType<ObjectResult>(testResponse.Result);
+        ObjectResult returnValue = Assert.IsType<ObjectResult>(testResponse.Result);
 
-            // Assert
-            Assert.Equal(StatusCodes.Status418ImATeapot, returnValue.StatusCode);
-        }
+        // Assert
+        Assert.Equal(StatusCodes.Status418ImATeapot, returnValue.StatusCode);
+    }
 
-        private void _setupMockMediator(BrewCoffeeQueryResponse brewCoffeeQueryResponse)
-        {
-            _mockMediator.Setup(x => x.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
-                                .ReturnsAsync(brewCoffeeQueryResponse);
-        }
-        private void _setupMockMediatorThrowException<T>() where T : Exception, new() 
-        {
-            _mockMediator.Setup(x => x.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
-                                .Throws<T>();
-        }
+    private void _setupMockMediator(BrewCoffeeQueryResponse brewCoffeeQueryResponse)
+    {
+        _mockMediator.Setup(x => x.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
+                            .ReturnsAsync(brewCoffeeQueryResponse);
+    }
+    private void _setupMockMediatorThrowException<T>() where T : Exception, new() 
+    {
+        _mockMediator.Setup(x => x.Send(It.IsAny<BrewCoffeeQuery>(), CancellationToken.None))
+                            .Throws<T>();
     }
 }

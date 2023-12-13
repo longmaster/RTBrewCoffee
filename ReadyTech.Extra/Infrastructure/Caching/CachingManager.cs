@@ -1,6 +1,8 @@
 ﻿using Application.Interfaces;
+using Common.ConfigOptions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace Infrastructure.Caching;
@@ -9,16 +11,19 @@ public class CachingManager : ICacheManager
 {
     private readonly IDistributedCache _distributedCache;
     private readonly ILogger<CachingManager> _logger;
+    private readonly IOptions<CacheConfig> _cacheConfig;
 
     public CachingManager(
         IDistributedCache distributedCache,
-        ILogger<CachingManager> logger)
+        ILogger<CachingManager> logger,
+        IOptions<CacheConfig> cacheConfig)
     {
         _distributedCache = distributedCache;
         _logger = logger;
+        _cacheConfig = cacheConfig;
 
     }
-    public async Task<T> GetRecordAsync<T>(string key)
+    public async Task<T?> GetRecordAsync<T>(string key)
     {
         try
         {
@@ -26,7 +31,11 @@ public class CachingManager : ICacheManager
            if (!string.IsNullOrEmpty(result)) 
             {
                 T data = JsonSerializer.Deserialize<T>(result);
-                return data;
+
+                if(data != null)
+                    return data;
+                else
+                    return default;
             }
 
             return default(T);
@@ -51,8 +60,8 @@ public class CachingManager : ICacheManager
 
             DistributedCacheEntryOptions distributedCacheEntryOptions = new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromSeconds(30),
-                SlidingExpiration = unusedExpireTime ?? TimeSpan.FromSeconds(60)
+                AbsoluteExpirationRelativeToNow = absoluteExpireTime ?? TimeSpan.FromHours(_cacheConfig.Value.AbsoluteExpireTimeInHours),
+                SlidingExpiration = unusedExpireTime ?? TimeSpan.FromSeconds(_cacheConfig.Value.SlidingExpirationTimeInHours)
             };
 
             string jsonData =  JsonSerializer.Serialize(data);

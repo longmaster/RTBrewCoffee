@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Common.ConfigOptions;
 public class ConnectionConfig
@@ -13,5 +8,5 @@ public class ConnectionConfig
     [Required(AllowEmptyStrings = false)]
     [DisplayFormat(ConvertEmptyStringToNull = false)]
     [MinLength(1)]
-    public  string RedisCache { get; set; }
+    public  string? RedisCache { get; set; }
 }

@@ -1,18 +1,27 @@
-﻿namespace Common.Constants
+﻿namespace Common.Constants;
+
+public static class StatusMessageConstants
 {
-    public static class StatusMessageConstants
+
+    private const string Ok = "Your piping hot coffee is ready";
+    private const string TempGreaterThanThirty = "Your refreshing iced coffee is ready";
+
+    private const string Exception = "Exception";
+
+    public static string Get(int statusCode)
+    { 
+        switch (statusCode)
+        {
+            case 200: return Ok;
+            default: return Exception;
+        }
+    }
+    public static string GetByTemperature(double temperature)
     {
-        private const string Ok = "Your piping hot coffee is ready";
-
-        private const string Exception = "Exception";
-
-        public static string Get(int number)
-        { 
-            switch (number)
-            {
-                case 200: return Ok;
-                default: return Exception;
-            }
+        switch (temperature)
+        {
+            case > 30: return TempGreaterThanThirty;
+            default: return string.Empty;
         }
     }
 }

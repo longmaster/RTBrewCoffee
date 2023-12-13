@@ -1,46 +1,46 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace Domain.OpenWeather
 {
     public class OpenWeather
     {
-        [JsonProperty("coord")]
+        [JsonPropertyName("coord")]
         public Coord Coord { get; set; }
 
-        [JsonProperty("weather")]
+        [JsonPropertyName("weather")]
         public Weather[] Weather { get; set; }
 
-        [JsonProperty("base")]
+        [JsonPropertyName("base")]
         public string Base { get; set; }
 
-        [JsonProperty("main")]
+        [JsonPropertyName("main")]
         public Main Main { get; set; }
 
-        [JsonProperty("visibility")]
+        [JsonPropertyName("visibility")]
         public long Visibility { get; set; }
 
-        [JsonProperty("wind")]
+        [JsonPropertyName("wind")]
         public Wind Wind { get; set; }
 
-        [JsonProperty("clouds")]
+        [JsonPropertyName("clouds")]
         public Clouds Clouds { get; set; }
 
-        [JsonProperty("dt")]
+        [JsonPropertyName("dt")]
         public long Dt { get; set; }
 
-        [JsonProperty("sys")]
+        [JsonPropertyName("sys")]
         public Sys Sys { get; set; }
 
-        [JsonProperty("timezone")]
+        [JsonPropertyName("timezone")]
         public long Timezone { get; set; }
 
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public long Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("cod")]
+        [JsonPropertyName("cod")]
         public long Cod { get; set; }
 
     }

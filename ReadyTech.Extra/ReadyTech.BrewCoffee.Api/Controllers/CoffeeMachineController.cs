@@ -10,7 +10,12 @@ public class CoffeeMachineController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger<CoffeeMachineController> _logger;
-    public CoffeeMachineController(IMediator mediator, ILogger<CoffeeMachineController> logger)
+
+
+    public CoffeeMachineController(
+        IMediator mediator, 
+        ILogger<CoffeeMachineController> logger
+        )
     {
         _mediator = mediator;
         _logger = logger;
@@ -20,7 +25,7 @@ public class CoffeeMachineController : ControllerBase
     [Route("brew-coffee")]
     public async Task<ActionResult<BrewCoffeeQueryResponse>> Brew()
     {
-        BrewCoffeeQueryResponse brewCoffeeQueryResponse = null;
+        BrewCoffeeQueryResponse? brewCoffeeQueryResponse = null;
 
         try
         { 
