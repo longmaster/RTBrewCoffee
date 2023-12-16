@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+      <InternalsVisibleTo Include="ReadyTech.BrewCoffee.Api.Integration.Tests"  />
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>

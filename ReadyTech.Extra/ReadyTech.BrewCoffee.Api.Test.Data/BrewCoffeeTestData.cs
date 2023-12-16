@@ -14,5 +14,10 @@ namespace ReadyTech.BrewCoffee.Api.Tests.Data
             };
             
         }
+
+        public static string BrewCoofeeJsonString()
+        {
+            return "{\"statusMessage\":\"Yourrefreshingicedcoffeeisready\",\"preparedDate\":\"2023-12-16T18:00:33+11\"}";
+        }
     }
 }

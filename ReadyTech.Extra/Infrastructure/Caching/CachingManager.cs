@@ -3,6 +3,8 @@ using Common.ConfigOptions;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Collections;
+using System.Text;
 using System.Text.Json;
 
 namespace Infrastructure.Caching;
@@ -27,10 +29,15 @@ public class CachingManager : ICacheManager
     {
         try
         {
-          string result = await _distributedCache.GetStringAsync(key)??"";
-           if (!string.IsNullOrEmpty(result)) 
+          Byte[] cachedByteData = await _distributedCache.GetAsync(key);
+
+            if(cachedByteData == null) return default(T?);
+
+            string cachedData = System.Text.Encoding.UTF8.GetString(cachedByteData);
+
+            if (!string.IsNullOrEmpty(cachedData)) 
             {
-                T data = JsonSerializer.Deserialize<T>(result);
+                T data = JsonSerializer.Deserialize<T>(json: cachedData);
 
                 if(data != null)
                     return data;
@@ -66,7 +73,9 @@ public class CachingManager : ICacheManager
 
             string jsonData =  JsonSerializer.Serialize(data);
 
-            await _distributedCache.SetStringAsync(key, jsonData, distributedCacheEntryOptions);
+            byte[] bytes = Encoding.UTF8.GetBytes(jsonData);
+
+            await _distributedCache.SetAsync(key, bytes, distributedCacheEntryOptions);
         }
 
         catch (Exception ex)
